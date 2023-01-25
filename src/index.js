@@ -1,8 +1,10 @@
 import getImages from './js/fetchData.js';
 import NewsApiService from './js/fetchData';
 
-var debounce = require('lodash.debounce');
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SimpleLightbox from 'simplelightbox';
+// Додатковий імпорт стилів
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 // Handelbars templates
 import articleTpl from './templates/image.hbs';
@@ -15,6 +17,11 @@ const newsApiService = new NewsApiService();
 // Prevent default behavior of the form
 form.addEventListener('submit', onSearch);
 loadMoreBtn.addEventListener('click', onLoadMore);
+
+let lightbox = new SimpleLightbox('.gallery a', {
+  /* options */
+  captionDelay: 300,
+});
 
 function onSearch(e) {
   e.preventDefault();
@@ -39,7 +46,10 @@ function onSearch(e) {
       loadMoreBtn.classList.remove('is-hidden');
       return articles;
     })
-    .then(appendArticlesMarkup);
+    .then(articles => {
+      appendArticlesMarkup(articles);
+      lightbox.refresh();
+    });
 }
 
 function onLoadMore() {
@@ -53,6 +63,7 @@ function onLoadMore() {
       return;
     }
     appendArticlesMarkup(articles);
+    lightbox.refresh();
   });
 }
 

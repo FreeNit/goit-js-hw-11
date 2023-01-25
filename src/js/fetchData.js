@@ -1,3 +1,5 @@
+const axios = require('axios').default;
+
 const BASIC_URL = 'https://pixabay.com/api/';
 const API_KEY = '17678291-8f52cafe3b96aa295b9f12444';
 
@@ -15,10 +17,11 @@ export default class NewsApiService {
     const url = `${BASIC_URL}?key=${API_KEY}&q=${this.searchQuery}&image_type=${this.imageType}&orientaion=${this.orientation}&safesearch=${this.safesearch}&page=${this.page}&per_page=${this.perPage}`;
 
     try {
-      const response = await fetch(url);
-      const photoCollection = await response.json();
+      // USING AXIOUS
+
+      const response = await axios.get(url);
       this.incrementPage();
-      return photoCollection;
+      return response.data;
     } catch (error) {
       console.log(error.message);
     }

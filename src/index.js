@@ -1,8 +1,10 @@
 import getImages from './js/fetchData.js';
 import NewsApiService from './js/fetchData';
+import checkPosition from './js/checkPosition';
 
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
+var throttle = require('lodash.throttle');
 // Додатковий імпорт стилів
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
@@ -82,3 +84,8 @@ function appendArticlesMarkup(articles) {
 function clearArticlesContainer() {
   galleryEl.innerHTML = '';
 }
+
+(() => {
+  window.addEventListener('scroll', throttle(checkPosition, 250));
+  window.addEventListener('resize', throttle(checkPosition, 250));
+})();

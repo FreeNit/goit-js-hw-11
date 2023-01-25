@@ -14,12 +14,21 @@ export default class NewsApiService {
   async fetchArticles() {
     const url = `${BASIC_URL}?key=${API_KEY}&q=${this.searchQuery}&image_type=${this.imageType}&orientaion=${this.orientation}&safesearch=${this.safesearch}&page=${this.page}&per_page=${this.perPage}`;
 
-    return fetch(url)
-      .then(responce => responce.json())
-      .then(({ hits, totalHits }) => {
-        this.incrementPage();
-        return { hits, totalHits };
-      });
+    // return fetch(url)
+    //   .then(responce => responce.json())
+    //   .then(({ hits, totalHits }) => {
+    //     this.incrementPage();
+    //     return { hits, totalHits };
+    //   });
+
+    try {
+      const response = await fetch(url);
+      const photoCollection = await response.json();
+      this.incrementPage();
+      return photoCollection;
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   incrementPage() {

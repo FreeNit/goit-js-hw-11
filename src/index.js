@@ -29,8 +29,8 @@ function onSearch(e) {
 
   newsApiService.resetPage();
   clearArticlesContainer();
-  let userRequest = e.currentTarget.elements.searchQuery.value;
-  if (!userRequest.trim()) {
+  let userRequest = e.currentTarget.elements.searchQuery.value.trim();
+  if (!userRequest) {
     Notify.failure('Please provide search data!');
     return;
   }
@@ -49,6 +49,7 @@ function onSearch(e) {
         return;
       }
       Notify.success(`Horray! We found ${totalHits} images.`);
+      newsApiService.myTotalHits = totalHits;
       return articles;
     })
     .then(articles => {
@@ -59,15 +60,16 @@ function onSearch(e) {
 }
 
 function onLoadMore() {
+  if (newsApiService.displayAmount >= newsApiService.myTotalHits) {
+    Notify.warning(
+      "We're sorry, but you've reached the end of search results."
+    );
+    loadMoreBtn.classList.add('is-hidden');
+    return;
+  }
+  console.log(newsApiService.myTotalHits);
   newsApiService.fetchArticles().then(data => {
     const { hits: articles, totalHits } = data;
-    if (newsApiService.displayAmount >= totalHits) {
-      Notify.warning(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-      loadMoreBtn.classList.add('is-hidden');
-      return;
-    }
     newsApiService.displayAmount += newsApiService.perPage;
     appendArticlesMarkup(articles);
     lightbox.refresh();

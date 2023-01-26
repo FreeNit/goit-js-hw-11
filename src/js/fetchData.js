@@ -12,6 +12,7 @@ export default class NewsApiService {
     this.page = 1;
     this.perPage = 40;
     this.displayAmount = this.perPage;
+    this.myTotalHits = 0;
   }
 
   async fetchArticles() {

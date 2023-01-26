@@ -29,8 +29,13 @@ function onSearch(e) {
 
   newsApiService.resetPage();
   clearArticlesContainer();
+  let userRequest = e.currentTarget.elements.searchQuery.value;
+  if (!userRequest.trim()) {
+    Notify.failure('Please provide search data!');
+    return;
+  }
 
-  newsApiService.searchQuery = e.currentTarget.elements.searchQuery.value;
+  newsApiService.searchQuery = userRequest;
 
   newsApiService
     .fetchArticles()

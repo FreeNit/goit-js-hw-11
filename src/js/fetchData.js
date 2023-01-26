@@ -11,6 +11,7 @@ export default class NewsApiService {
     this.safesearch = true;
     this.page = 1;
     this.perPage = 40;
+    this.displayAmount = this.perPage;
   }
 
   async fetchArticles() {

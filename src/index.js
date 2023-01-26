@@ -1,6 +1,5 @@
 import getImages from './js/fetchData.js';
 import NewsApiService from './js/fetchData';
-import checkPosition from './js/checkPosition';
 
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
@@ -45,27 +44,30 @@ function onSearch(e) {
         return;
       }
       Notify.success(`Horray! We found ${totalHits} images.`);
-      loadMoreBtn.classList.remove('is-hidden');
       return articles;
     })
     .then(articles => {
       appendArticlesMarkup(articles);
       lightbox.refresh();
+      loadMoreBtn.classList.remove('is-hidden');
     });
 }
 
 function onLoadMore() {
   newsApiService.fetchArticles().then(data => {
     const { hits: articles, totalHits } = data;
-    if (totalHits === 1) {
+    if (newsApiService.displayAmount >= totalHits) {
       Notify.warning(
         'Sorry, there are no images matching your search query. Please try again.'
       );
       loadMoreBtn.classList.add('is-hidden');
       return;
     }
+    newsApiService.displayAmount += newsApiService.perPage;
     appendArticlesMarkup(articles);
     lightbox.refresh();
+
+    // Smooth scrolling
     const { height: cardHeight } = document
       .querySelector('.gallery')
       .firstElementChild.getBoundingClientRect();
@@ -84,8 +86,3 @@ function appendArticlesMarkup(articles) {
 function clearArticlesContainer() {
   galleryEl.innerHTML = '';
 }
-
-(() => {
-  window.addEventListener('scroll', throttle(checkPosition, 250));
-  window.addEventListener('resize', throttle(checkPosition, 250));
-})();

@@ -16,7 +16,7 @@ export default class NewsApiService {
   }
 
   async fetchArticles() {
-    const url = `${BASIC_URL}?key=${API_KEY}&q=${this.searchQuery}&image_type=${this.imageType}&orientaion=${this.orientation}&safesearch=${this.safesearch}&page=${this.page}&per_page=${this.perPage}`;
+    const url = `${BASIC_URL}?key=${API_KEY}&q=${this.searchQuery}&image_type=${this.imageType}&orientation=${this.orientation}&safesearch=${this.safesearch}&page=${this.page}&per_page=${this.perPage}`;
 
     try {
       // USING AXIOUS

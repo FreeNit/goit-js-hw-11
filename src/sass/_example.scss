@@ -11,10 +11,11 @@
 }
 
 .gallery {
+  margin: 10px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
-  row-gap: 10px;
+  justify-content: flex-start;
+  gap: 10px;
 }
 
 .photo-card {

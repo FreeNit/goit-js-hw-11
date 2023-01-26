@@ -24,12 +24,14 @@ let lightbox = new SimpleLightbox('.gallery a', {
   captionDelay: 300,
 });
 
-function onSearch(e) {
+async function onSearch(e) {
   e.preventDefault();
 
   newsApiService.resetPage();
   clearArticlesContainer();
   let userRequest = e.currentTarget.elements.searchQuery.value.trim();
+  loadMoreBtn.classList.add('is-hidden');
+
   if (!userRequest) {
     Notify.failure('Please provide search data!');
     return;
@@ -37,29 +39,39 @@ function onSearch(e) {
 
   newsApiService.searchQuery = userRequest;
 
-  newsApiService
-    .fetchArticles()
-    .then(data => {
-      const { hits: articles, totalHits } = data;
-      // check if collection has data
-      if (articles.length === 0) {
-        Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-        return;
-      }
-      Notify.success(`Horray! We found ${totalHits} images.`);
-      newsApiService.myTotalHits = totalHits;
-      return articles;
-    })
-    .then(articles => {
-      appendArticlesMarkup(articles);
-      lightbox.refresh();
-      loadMoreBtn.classList.remove('is-hidden');
-    });
+  try {
+    const fetchedData = await newsApiService.fetchArticles();
+
+    const { hits: articles, totalHits } = fetchedData;
+
+    // Check if we received data in request
+    if (articles.length === 0) {
+      console.log(articles.length);
+      loadMoreBtn.classList.add('is-hidden');
+
+      Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      return;
+    }
+    // Show success message
+    Notify.success(`Horray! We found ${totalHits} images.`);
+    // Use displayAmount to calculate how much pictures will display
+    newsApiService.displayAmount = newsApiService.perPage;
+    // Value how much matches query get
+    newsApiService.myTotalHits = totalHits;
+    // Append html markup to the page
+    appendArticlesMarkup(articles);
+    // refresh lightbox
+    lightbox.refresh();
+    // Show 'load more' button
+    loadMoreBtn.classList.remove('is-hidden');
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 
-function onLoadMore() {
+async function onLoadMore() {
   if (newsApiService.displayAmount >= newsApiService.myTotalHits) {
     Notify.warning(
       "We're sorry, but you've reached the end of search results."
@@ -67,10 +79,12 @@ function onLoadMore() {
     loadMoreBtn.classList.add('is-hidden');
     return;
   }
-  console.log(newsApiService.myTotalHits);
-  newsApiService.fetchArticles().then(data => {
-    const { hits: articles, totalHits } = data;
-    newsApiService.displayAmount += newsApiService.perPage;
+  // Update quantity how much pictures has already displayed
+  newsApiService.displayAmount += newsApiService.perPage;
+
+  try {
+    const fetchedData = await newsApiService.fetchArticles();
+    const { hits: articles } = fetchedData;
     appendArticlesMarkup(articles);
     lightbox.refresh();
 
@@ -83,7 +97,9 @@ function onLoadMore() {
       top: cardHeight * 2,
       behavior: 'smooth',
     });
-  });
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 
 function appendArticlesMarkup(articles) {
